@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FeaturesSection from "@/components/features-section";
+import Link from "next/link";
 
 // Magnetic cursor pull for Hero CTAs
 function MagneticWrapper({
@@ -170,7 +171,9 @@ export default function Home() {
             className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary mb-8 hover:bg-primary/10 transition-colors cursor-pointer"
           >
             <Sparkles className="size-3.5" />
-            <span>Mistic v1.0 is officially live</span>
+            <Link href="/app">
+              <span>Mistic v1.0 is officially live</span>
+            </Link>
             <ArrowRight className="size-3" />
           </motion.div>
 
@@ -412,7 +415,7 @@ export default function Home() {
                   Real-Time Alignment
                 </span>
 
-                <div className="flex flex-col gap-3.5 h-full">
+                <div className="flex flex-col gap-3.5 h-50 overflow-hidden">
                   <AnimatePresence initial={false}>
                     {workspaceLogs.map((log, idx) => (
                       <motion.div
@@ -434,11 +437,10 @@ export default function Home() {
                       </motion.div>
                     ))}
                   </AnimatePresence>
-
-                  <div className="mt-auto pt-4 border-t border-border/60 flex flex-col gap-1.5 text-[10px] text-muted-foreground font-mono">
-                    <div>Draggable card X: {Math.round(draggedCardPos.x)}</div>
-                    <div>Draggable card Y: {Math.round(draggedCardPos.y)}</div>
-                  </div>
+                </div>
+                <div className="mt-auto pt-4 border-t border-border/60 flex flex-col gap-1.5 text-[10px] text-muted-foreground font-mono">
+                  <div>Draggable card X: {Math.round(draggedCardPos.x)}</div>
+                  <div>Draggable card Y: {Math.round(draggedCardPos.y)}</div>
                 </div>
               </div>
             </div>

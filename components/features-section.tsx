@@ -469,7 +469,7 @@ function InfiniteCanvasPlayground() {
     },
   ]);
   const [selectedTool, setSelectedTool] = useState<
-    "box" | "circle" | "arrow" | "select"
+    "box" | "circle" | "arrow" | "select" | "text"
   >("select");
   const [coords, setCoords] = useState({ x: 180, y: 85 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -493,7 +493,9 @@ function InfiniteCanvasPlayground() {
           ? "New Block"
           : selectedTool === "circle"
             ? "New Node"
-            : "Link",
+            : selectedTool === "text"
+              ? "Comment over the layout"
+              : "Link",
     };
 
     setElements((prev) => [...prev, newElem]);
@@ -771,6 +773,18 @@ function InfiniteCanvasPlayground() {
           >
             <ArrowRight className="size-3.5" />
           </button>
+          <button
+            onClick={() => setSelectedTool("text")}
+            className={cn(
+              "px-2.5 py-1.5 text-[9px] font-mono border rounded transition-all duration-300 cursor-pointer",
+              selectedTool === "text"
+                ? "bg-[#28b3cb]/10 border-[#28b3cb]/40 text-[#28b3cb]"
+                : "bg-[#121214] border-border text-muted-foreground hover:text-white",
+            )}
+            title="Sketch Text"
+          >
+            Text
+          </button>
         </div>
 
         <button
@@ -805,6 +819,21 @@ function GhostWritingEditorPlayground() {
 
   // Helper to parse simple markdown to HTML representation
   const renderMockMarkdown = (mdStr: string) => {
+    // Helper to handle inline bolding
+    const renderSpans = (text: string) => {
+      const parts = text.split(/(\*\*.*?\*\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={i} className="font-bold text-foreground">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      });
+    };
+
     return mdStr.split("\n").map((line, idx) => {
       if (line.startsWith("# ")) {
         return (
@@ -869,7 +898,7 @@ function GhostWritingEditorPlayground() {
           key={idx}
           className="text-[10px] text-muted-foreground leading-relaxed font-sans"
         >
-          {line}
+          {renderSpans(line)}
         </p>
       );
     });

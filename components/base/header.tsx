@@ -7,12 +7,18 @@ import { Menu, X, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Magnetic effect component for premium CTA pull
-function MagneticButton({ children, className }: { children: React.ReactNode; className?: string }) {
+function MagneticButton({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   const springConfig = { damping: 15, stiffness: 150, mass: 0.6 };
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
@@ -23,11 +29,11 @@ function MagneticButton({ children, className }: { children: React.ReactNode; cl
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
     const centerY = top + height / 2;
-    
+
     // Calculate distance and pull factor
     const distanceX = clientX - centerX;
     const distanceY = clientY - centerY;
-    
+
     // Pull factor caps the movement so it feels "magnetic" but anchored
     x.set(distanceX * 0.35);
     y.set(distanceY * 0.35);
@@ -102,7 +108,7 @@ export default function Header() {
           <div className="hidden md:block">
             <MagneticButton>
               <Link
-                href="#launch"
+                href="/app"
                 className="group relative flex h-9 items-center justify-center gap-1.5 overflow-hidden rounded-full border border-border bg-[#121214] px-4 text-xs font-semibold text-white transition-all duration-300 hover:border-primary hover:shadow-[0_0_12px_rgba(139,92,246,0.2)]"
               >
                 <span>Launch App</span>
@@ -143,7 +149,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="#launch"
+              href="/app"
               onClick={() => setIsOpen(false)}
               className="mt-2 flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-primary bg-primary/10 text-sm font-semibold text-white hover:bg-primary transition-all duration-300"
             >
