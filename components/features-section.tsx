@@ -1027,7 +1027,13 @@ function DropZonePlayground() {
     fileSize: string,
     fileType: string,
   ) => {
-    if (uploadProgress !== null) return;
+    if (uploadProgress !== null || vaultLocked) {
+      if (vaultLocked) {
+        setActiveSha("ACCESS DENIED // VAULT PROTOCOL LOCKED");
+      }
+      return;
+    }
+
     setUploadProgress(0);
     setActiveSha("GENERATING INTEGRITY HASH...");
 
@@ -1071,8 +1077,12 @@ function DropZonePlayground() {
 
     if (!vaultTargetRef.current) return;
     const targetRect = vaultTargetRef.current.getBoundingClientRect();
-    const dropX = info.point.x;
-    const dropY = info.point.y;
+    const dropX =
+      event.clientX ||
+      (event.changedTouches && event.changedTouches[0].clientX);
+    const dropY =
+      event.clientY ||
+      (event.changedTouches && event.changedTouches[0].clientY);
 
     // Check if drop is inside vault target boundaries
     if (

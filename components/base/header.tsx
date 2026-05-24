@@ -62,9 +62,9 @@ export default function Header() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   const navLinks = [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Docs", href: "#docs" },
+    { name: "Features", href: "/#features" },
+    { name: "Pricing", href: "/#pricing" },
+    { name: "Docs", href: "/#docs" },
   ];
 
   return (
