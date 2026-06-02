@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 // Magnetic effect component for premium CTA pull
 function MagneticButton({
@@ -58,14 +59,19 @@ function MagneticButton({
 }
 
 export default function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   const navLinks = [
     { name: "Features", href: "/#features" },
-    { name: "Pricing", href: "/#pricing" },
+    { name: "Pricing", href: "/pricing" },
     { name: "Docs", href: "/#docs" },
   ];
+
+  if (pathname?.startsWith("/app")) {
+    return null;
+  }
 
   return (
     <>

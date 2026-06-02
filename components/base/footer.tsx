@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+
+  if (pathname?.startsWith("/app")) {
+    return null;
+  }
 
   const links = [
     { name: "Privacy", href: "#privacy" },
