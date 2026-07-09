@@ -561,7 +561,7 @@ export default function Home() {
                 exit={{ opacity: 0, y: -10 }}
                 className="text-xs font-semibold text-emerald-400 mt-4"
               >
-                ✨ Thank you! We've reserved your early access spot. Check your
+                ✨ Thank you! {`We've`} reserved your early access spot. Check your
                 inbox soon.
               </motion.p>
             )}

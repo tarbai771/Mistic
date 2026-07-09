@@ -9,7 +9,7 @@ export default function Application() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0B0B0C] text-foreground select-none relative">
+    <div className="flex h-svh w-screen overflow-hidden bg-[#0B0B0C] text-foreground select-none relative">
       {/* Dynamic tab/sidebar navigation drawer */}
       <Sidebar
         activeTab={activeTab}
