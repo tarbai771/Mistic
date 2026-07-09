@@ -4,6 +4,7 @@ import {
 	AnimatePresence,
 	motion,
 	useMotionValue,
+
 	useScroll,
 	useSpring,
 	useTransform,
@@ -26,7 +27,6 @@ import {
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import FeaturesSection from "@/components/features-section";
-import { Button } from "@/components/ui/button";
 
 // Magnetic cursor pull for Hero CTAs
 function MagneticWrapper({
@@ -127,14 +127,11 @@ export default function Home() {
 		{ id: "init-2", message: "Alex edited System Goals block" },
 		{ id: "init-3", message: "Devon completed Review Task #42" },
 	]);
-
 	const [email, setEmail] = useState("");
 	const [isEmailFocused, setIsEmailFocused] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [draggedCardPos, setDraggedCardPos] = useState({ x: 0, y: 0 });
-
-	const featureRef = useRef<HTMLDivElement>(null);
 
 	// Real-time workspace activities generator
 	useEffect(() => {
@@ -148,6 +145,7 @@ export default function Home() {
 		];
 		const interval = setInterval(() => {
 			const randomAction = actions[Math.floor(Math.random() * actions.length)];
+
 			// Generate a distinct timestamp/ID combo for each newly injected log
 			const newLog: WorkspaceLog = {
 				id: `${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -161,7 +159,6 @@ export default function Home() {
 				return [newLog, first, second].filter(Boolean).slice(0, 3);
 			});
 		}, 4500);
-
 		return () => clearInterval(interval);
 	}, []);
 
@@ -379,7 +376,8 @@ export default function Home() {
 													top: -120,
 													bottom: 120,
 												}}
-												onDrag={(event, info) => {
+												onDrag={(_event, info) => {
+
 													setDraggedCardPos({
 														x: info.point.x,
 														y: info.point.y,
