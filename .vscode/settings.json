@@ -1,4 +1,12 @@
 {
-  "biome.lsp.trace.server": "messages",
-  "js/ts.tsdk.path": "node_modules/typescript/lib"
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always",
+    "source.organizeImports.biome": "always"
+  },
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
 }

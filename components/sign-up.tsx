@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TestSignUp } from "./testing-sign-up";
+import { type Profile, TestSignUp } from "./testing-sign-up";
 import { Separator } from "./ui/separator";
 
 export function SignUp() {
   // Store the full profile object (or null)
-  const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSelectProfile = (profile: any | null) => {
+  const handleSelectProfile = (profile: Profile | null) => {
     setSelectedProfile(profile); // Track the object
     if (profile) {
       setEmail(profile.email);
@@ -76,7 +76,7 @@ export function SignUp() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <a
-                  href="#"
+                  href="/placeholder" //placeholding
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
                   Forgot your password?

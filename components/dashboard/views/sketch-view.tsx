@@ -350,7 +350,7 @@ export default function SketchView() {
         <div className="absolute bottom-6 left-6 z-20 flex flex-col bg-[#121214] border border-border p-4 rounded-xl shadow-2xl gap-4 font-mono select-none w-52">
           {/* Color Selector */}
           <div>
-            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider block mb-2 flex items-center gap-1">
+            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
               <Palette className="size-3 text-primary" /> Colors
             </span>
             <div className="flex gap-2">
@@ -383,7 +383,7 @@ export default function SketchView() {
 
           {/* Stroke Width Selector */}
           <div>
-            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider block mb-2 flex items-center gap-1">
+            <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
               <Settings className="size-3 text-primary" /> Stroke Width
             </span>
             <div className="flex gap-1.5">

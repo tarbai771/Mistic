@@ -20,7 +20,7 @@ export default function ViewportStage({ activeTab }: ViewportStageProps) {
   };
 
   return (
-    <div className="flex-grow h-full overflow-hidden bg-[#0B0B0C] relative pb-16 md:pb-0">
+    <div className="grow h-full overflow-hidden bg-[#0B0B0C] relative pb-16 md:pb-0">
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}

@@ -188,8 +188,8 @@ export default function EditorView() {
           />
 
           {/* Simulated Multiplayer Live Typed Text */}
-          <div className="relative border-l-2 border-amber-500/30 pl-4 mt-6 bg-amber-500/5 rounded p-3 border border-border/40 select-none">
-            <span className="text-[9px] font-bold text-amber-400 block mb-2 flex items-center gap-1">
+          <div className="relative border-l-2 border-l-amber-500/30 pl-4 mt-6 bg-amber-500/5 rounded p-3 border border-border/40 select-none">
+            <span className="text-[9px] font-bold text-amber-400 mb-2 flex items-center gap-1">
               <Users className="size-3 text-amber-500" /> Alex (Backend
               Developer) is contributing
             </span>

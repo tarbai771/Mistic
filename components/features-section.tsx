@@ -9,18 +9,14 @@ import {
 import {
   Activity,
   ArrowRight,
-  ArrowUpRight,
   Check,
   Circle as CircleIcon,
   Code,
-  Edit2,
   FileText,
-  Layers,
   Lock,
   Mic,
   MicOff,
   MousePointer2,
-  Phone,
   Sparkles,
   Square,
   Trash2,
@@ -319,7 +315,7 @@ function FluidCommunicationPlayground() {
                     </div>
 
                     <span className="absolute bottom-1 right-1.5 text-[8px] font-mono text-muted-foreground/70">
-                      1080P // OPUS
+                      1080P {"// OPUS"}
                     </span>
                   </div>
                 )}
@@ -330,6 +326,7 @@ function FluidCommunicationPlayground() {
                 <span>RSSI: -45dBm</span>
                 {p.id === "4" && (
                   <button
+                    type="button"
                     onClick={handleRemoveGuest}
                     className="hover:text-destructive hover:underline cursor-pointer transition-colors"
                   >
@@ -347,6 +344,7 @@ function FluidCommunicationPlayground() {
         <div className="flex gap-2">
           {/* Mute toggle button */}
           <button
+            type="button"
             onClick={toggleMyMute}
             className={cn(
               "p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer",
@@ -365,6 +363,7 @@ function FluidCommunicationPlayground() {
 
           {/* Video toggle button */}
           <button
+            type="button"
             onClick={toggleMyVideo}
             className={cn(
               "p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer",
@@ -385,6 +384,7 @@ function FluidCommunicationPlayground() {
         {/* Magnetic Invitation button */}
         <MagneticItem>
           <button
+            type="button"
             onClick={handleAddGuest}
             disabled={participants.length >= 4}
             className={cn(
@@ -473,14 +473,10 @@ function InfiniteCanvasPlayground() {
     "box" | "circle" | "arrow" | "select" | "text"
   >("select");
   const [coords, setCoords] = useState({ x: 180, y: 85 });
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (selectedTool === "select" || !containerRef.current) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.round(e.clientX - rect.left);
-    const y = Math.round(e.clientY - rect.top);
+  const createSketchedElement = (x: number, y: number) => {
+    if (selectedTool === "select") return;
 
     const newElem: SketchedElement = {
       id: Date.now().toString(),
@@ -503,7 +499,24 @@ function InfiniteCanvasPlayground() {
     setSelectedTool("select"); // Reset to select tool
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Clean Mouse Click Handler
+  const handleCanvasClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.round(e.clientX - rect.left);
+    const y = Math.round(e.clientY - rect.top);
+    createSketchedElement(x, y);
+  };
+
+  // 4. Keyboard Handler (Uses current cursor coords state)
+  const handleCanvasKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      createSketchedElement(coords.x, coords.y);
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     setCoords({
@@ -522,15 +535,17 @@ function InfiniteCanvasPlayground() {
       <div className="flex justify-between items-center bg-[#0B0B0C] border border-border px-3 py-1.5 rounded text-[10px] font-mono text-muted-foreground">
         <span>EXCALIDRAW LITE v2.0.4</span>
         <span>
-          X: {coords.x}px // Y: {coords.y}px
+          X: {coords.x}px {"// Y:"} {coords.y}px
         </span>
       </div>
 
       {/* Sketched Whiteboard Canvas */}
-      <div
+      <section
+        aria-label="Sketch whiteboard canvas"
         ref={containerRef}
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
+        onKeyDown={handleCanvasKeyDown}
         className={cn(
           "flex-1 border border-border/80 bg-[#0B0B0C] rounded-lg relative overflow-hidden transition-all duration-300 min-h-55",
           selectedTool !== "select" ? "cursor-crosshair" : "cursor-default",
@@ -542,7 +557,10 @@ function InfiniteCanvasPlayground() {
         }}
       >
         {/* Render SVG Sketched elements (Excalidraw aesthetic) */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          aria-hidden="true"
+        >
           <AnimatePresence>
             {elements.map((el) => {
               if (el.type === "box") {
@@ -722,12 +740,13 @@ function InfiniteCanvasPlayground() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </section>
 
       {/* Sketched drawing toolbar */}
       <div className="flex justify-between items-center pt-2.5 border-t border-border">
         <div className="flex items-center gap-1">
           <button
+            type="button"
             onClick={() => setSelectedTool("select")}
             className={cn(
               "px-2.5 py-1.5 text-[9px] font-mono border rounded transition-all duration-300 cursor-pointer",
@@ -739,6 +758,7 @@ function InfiniteCanvasPlayground() {
             SELECT
           </button>
           <button
+            type="button"
             onClick={() => setSelectedTool("box")}
             className={cn(
               "p-1.5 border rounded transition-all duration-300 cursor-pointer flex items-center justify-center",
@@ -751,6 +771,7 @@ function InfiniteCanvasPlayground() {
             <Square className="size-3.5" />
           </button>
           <button
+            type="button"
             onClick={() => setSelectedTool("circle")}
             className={cn(
               "p-1.5 border rounded transition-all duration-300 cursor-pointer flex items-center justify-center",
@@ -763,6 +784,7 @@ function InfiniteCanvasPlayground() {
             <CircleIcon className="size-3.5" />
           </button>
           <button
+            type="button"
             onClick={() => setSelectedTool("arrow")}
             className={cn(
               "p-1.5 border rounded transition-all duration-300 cursor-pointer flex items-center justify-center",
@@ -775,6 +797,7 @@ function InfiniteCanvasPlayground() {
             <ArrowRight className="size-3.5" />
           </button>
           <button
+            type="button"
             onClick={() => setSelectedTool("text")}
             className={cn(
               "px-2.5 py-1.5 text-[9px] font-mono border rounded transition-all duration-300 cursor-pointer",
@@ -789,6 +812,7 @@ function InfiniteCanvasPlayground() {
         </div>
 
         <button
+          type="button"
           onClick={clearCanvas}
           className="p-1.5 border border-border bg-[#121214] hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive text-muted-foreground rounded transition-all duration-300 cursor-pointer flex items-center justify-center"
           title="Clear Board"
@@ -826,22 +850,28 @@ function GhostWritingEditorPlayground() {
       const parts = text.split(/(\*\*.*?\*\*)/g);
 
       return parts.map((part, i) => {
+        // Create a stable key combining index and a snippet of the string content
+        const stableKey = `md-part-${i}-${part.slice(0, 10)}`;
+
         if (part.startsWith("**") && part.endsWith("**")) {
           return (
-            <strong key={i} className="font-bold text-foreground">
+            <strong key={stableKey} className="font-bold text-foreground">
               {part.slice(2, -2)}
             </strong>
           );
         }
-        return <span key={i}>{part}</span>;
+        return <span key={stableKey}>{part}</span>;
       });
     };
 
     return mdStr.split("\n").map((line, idx) => {
+      // Generate a stable key using a prefix and a safe slice of the line text
+      const lineKey = `md-line-${idx}-${line.slice(0, 15)}`;
+
       if (line.startsWith("# ")) {
         return (
           <h2
-            key={idx}
+            key={lineKey}
             className="text-sm font-extrabold text-white mt-2 mb-1 tracking-tight border-b border-border/40 pb-1"
           >
             {line.slice(2)}
@@ -851,7 +881,7 @@ function GhostWritingEditorPlayground() {
       if (line.startsWith("## ")) {
         return (
           <h3
-            key={idx}
+            key={lineKey}
             className="text-xs font-bold text-indigo-400 mt-2 mb-1 tracking-tight"
           >
             {line.slice(3)}
@@ -864,7 +894,7 @@ function GhostWritingEditorPlayground() {
         const [_, prefix, content] = numberedMatch;
         return (
           <div
-            key={idx}
+            key={lineKey}
             className="pl-4 text-[10px] text-muted-foreground leading-relaxed flex items-start gap-1 font-mono"
           >
             {/* The number (prefix) remains mono and indigo */}
@@ -878,7 +908,7 @@ function GhostWritingEditorPlayground() {
       if (line.startsWith("- [x] ")) {
         return (
           <div
-            key={idx}
+            key={lineKey}
             className="pl-4 text-[10px] text-emerald-400 leading-relaxed flex items-center gap-1.5 font-mono"
           >
             <Check className="size-3 stroke-3" />
@@ -891,7 +921,7 @@ function GhostWritingEditorPlayground() {
       if (line.startsWith("- [ ] ")) {
         return (
           <div
-            key={idx}
+            key={lineKey}
             className="pl-4 text-[10px] text-muted-foreground leading-relaxed flex items-center gap-1.5 font-mono"
           >
             <span className="size-2 rounded border border-border inline-block" />
@@ -900,11 +930,11 @@ function GhostWritingEditorPlayground() {
         );
       }
       if (line.trim() === "") {
-        return <div key={idx} className="h-1.5" />;
+        return <div key={lineKey} className="h-1.5" />;
       }
       return (
         <p
-          key={idx}
+          key={lineKey}
           className="text-[10px] text-muted-foreground leading-relaxed font-sans"
         >
           {renderSpans(line)}
@@ -949,8 +979,8 @@ function GhostWritingEditorPlayground() {
           </div>
 
           <div className="absolute bottom-2 right-2.5 text-[8px] font-mono text-muted-foreground/60 select-none">
-            {text.length} CHARS // {text.split(/\s+/).filter(Boolean).length}{" "}
-            WORDS
+            {text.length} CHARS {"//"}
+            {text.split(/\s+/).filter(Boolean).length} WORDS
           </div>
         </div>
 
@@ -974,6 +1004,7 @@ function GhostWritingEditorPlayground() {
             : "👥 Devon & Chloe are review-monitoring..."}
         </span>
         <button
+          type="button"
           onClick={() => setIsPreview(!isPreview)}
           className="px-2.5 py-1 text-[9px] font-mono border border-border bg-[#121214] text-muted-foreground hover:text-white rounded transition-colors cursor-pointer select-none"
         >
@@ -1068,8 +1099,7 @@ function DropZonePlayground() {
   };
 
   const handleDragEnd = (
-    event: any,
-    info: any,
+    event: MouseEvent | TouchEvent | PointerEvent,
     assetName: string,
     assetSize: string,
     assetType: string,
@@ -1078,14 +1108,20 @@ function DropZonePlayground() {
 
     if (!vaultTargetRef.current) return;
     const targetRect = vaultTargetRef.current.getBoundingClientRect();
-    const dropX =
-      event.clientX ||
-      (event.changedTouches && event.changedTouches[0].clientX);
-    const dropY =
-      event.clientY ||
-      (event.changedTouches && event.changedTouches[0].clientY);
+
+    // Cast to a structural type to cleanly bypass the property check errors
+    const e = event as {
+      clientX?: number;
+      clientY?: number;
+      changedTouches?: TouchList;
+    };
+
+    const dropX = e.clientX || e.changedTouches?.[0]?.clientX;
+    const dropY = e.clientY || e.changedTouches?.[0]?.clientY;
 
     // Check if drop is inside vault target boundaries
+    if (dropX === undefined || dropY === undefined) return;
+
     if (
       dropX >= targetRect.left &&
       dropX <= targetRect.right &&
@@ -1123,14 +1159,8 @@ function DropZonePlayground() {
               drag
               dragSnapToOrigin
               onDragStart={() => setDraggedOver(true)}
-              onDragEnd={(e, info) =>
-                handleDragEnd(
-                  e,
-                  info,
-                  "api_contract.yaml",
-                  "12 KB",
-                  "YAML Pipeline",
-                )
+              onDragEnd={(e) =>
+                handleDragEnd(e, "api_contract.yaml", "12 KB", "YAML Pipeline")
               }
               className="bg-[#121214] border border-border hover:border-primary/50 p-2 rounded cursor-grab active:cursor-grabbing text-left flex items-center justify-between transition-all select-none group"
             >
@@ -1155,14 +1185,8 @@ function DropZonePlayground() {
               drag
               dragSnapToOrigin
               onDragStart={() => setDraggedOver(true)}
-              onDragEnd={(e, info) =>
-                handleDragEnd(
-                  e,
-                  info,
-                  "brand_vector.svg",
-                  "310 KB",
-                  "Vector Design",
-                )
+              onDragEnd={(e) =>
+                handleDragEnd(e, "brand_vector.svg", "310 KB", "Vector Design")
               }
               className="bg-[#121214] border border-border hover:border-emerald-500/50 p-2 rounded cursor-grab active:cursor-grabbing text-left flex items-center justify-between transition-all select-none group"
             >
@@ -1187,14 +1211,8 @@ function DropZonePlayground() {
               drag
               dragSnapToOrigin
               onDragStart={() => setDraggedOver(true)}
-              onDragEnd={(e, info) =>
-                handleDragEnd(
-                  e,
-                  info,
-                  "secrets_env.key",
-                  "1.1 KB",
-                  "Key Secret",
-                )
+              onDragEnd={(e) =>
+                handleDragEnd(e, "secrets_env.key", "1.1 KB", "Key Secret")
               }
               className="bg-[#121214] border border-border hover:border-amber-500/50 p-2 rounded cursor-grab active:cursor-grabbing text-left flex items-center justify-between transition-all select-none group"
             >
@@ -1233,7 +1251,8 @@ function DropZonePlayground() {
           )}
         >
           {/* Target Overlay Lock Indicator */}
-          <div
+          <button
+            type="button"
             className="absolute top-2 right-2 cursor-pointer"
             onClick={() => setVaultLocked(!vaultLocked)}
           >
@@ -1242,7 +1261,7 @@ function DropZonePlayground() {
             ) : (
               <Unlock className="size-3.5 text-muted-foreground hover:text-white transition-colors" />
             )}
-          </div>
+          </button>
 
           <div className="flex-1 flex flex-col items-center justify-center text-center p-3">
             {uploadProgress !== null ? (
@@ -1287,6 +1306,7 @@ function DropZonePlayground() {
               <span>SECURED ARCHIVES ({vaultAssets.length})</span>
               {vaultAssets.length > 0 && (
                 <button
+                  type="button"
                   onClick={clearVault}
                   className="text-destructive hover:underline cursor-pointer"
                 >
@@ -1320,7 +1340,7 @@ function DropZonePlayground() {
 
       {/* Terminal log output */}
       <div className="border border-border/80 bg-[#0B0B0C] px-3 py-1.5 rounded text-[8px] font-mono text-muted-foreground select-text text-left max-h-10.5 overflow-y-auto">
-        <span className="text-primary font-bold mr-1">// CONSOLE LOG:</span>
+        <span className="text-primary font-bold mr-1">{"// CONSOLE LOG:"}</span>
         {activeSha}
       </div>
     </div>
@@ -1413,7 +1433,8 @@ export default function FeaturesSection() {
               {features.map((feat) => {
                 const isActive = activeTab === feat.id;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={feat.id}
                     onClick={() => setActiveTab(feat.id)}
                     className={cn(
@@ -1461,7 +1482,7 @@ export default function FeaturesSection() {
                         TELEMETRY: {feat.telemetry}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -1572,7 +1593,7 @@ export default function FeaturesSection() {
               {/* Playground Window Footer */}
               <div className="flex justify-between items-center border-t border-border pt-3 select-none">
                 <span className="text-[9px] font-mono text-muted-foreground uppercase">
-                  ACTIVE PIPELINE: 0{activeTab + 1} // SYNC ENGINE READY
+                  ACTIVE PIPELINE: 0{activeTab + 1} {"// SYNC ENGINE READY"}
                 </span>
                 <span className="text-[9px] font-mono text-muted-foreground uppercase flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-primary rounded-full animate-ping" />

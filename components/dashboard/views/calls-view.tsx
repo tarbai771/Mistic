@@ -260,7 +260,7 @@ export default function CallsView() {
                   <div className="flex-1 flex flex-col items-center justify-center py-6 relative select-none">
                     {p.video ? (
                       // High-fidelity Mock Video feed (animated waves or grids to feel alive)
-                      <div className="absolute inset-2 bg-gradient-to-br from-[#121214] to-[#1a1a1f] rounded-lg border border-border flex flex-col items-center justify-center overflow-hidden">
+                      <div className="absolute inset-2 bg-linear-to-br from-[#121214] to-[#1a1a1f] rounded-lg border border-border flex flex-col items-center justify-center overflow-hidden">
                         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#8b5cf6_1px,transparent_1px)] bg-size-[16px_16px]" />
 
                         <motion.div

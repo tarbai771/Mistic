@@ -67,7 +67,7 @@ const profiles = [
   },
 ];
 
-type Profile = (typeof profiles)[number];
+export type Profile = (typeof profiles)[number];
 
 interface TestSignUpProps {
   selectedProfile: Profile | null;
