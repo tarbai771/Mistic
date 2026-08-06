@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   Combobox,
   ComboboxContent,
@@ -14,8 +16,10 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
+import { createClient } from "@/lib/supabase/client";
 
-const profiles = [
+// Static dummy profiles for quick testing
+export const profiles = [
   {
     id: 1,
     username: "Thukuna",
@@ -33,7 +37,7 @@ const profiles = [
   {
     id: 3,
     username: "Miku",
-    email: "miku@vocaloid",
+    email: "miku@vocaloid.com",
     password: "VegetableJuice",
     status: "offline",
   },
@@ -78,47 +82,115 @@ export function TestSignUp({
   selectedProfile,
   onSelectProfile,
 }: TestSignUpProps) {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleProfileSelect = async (profile: Profile | null) => {
+    onSelectProfile(profile);
+    if (!profile) return;
+
+    setLoading(true);
+    setErrorMessage("");
+
+    // Trying to Log In first
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: profile.email,
+      password: profile.password,
+    });
+
+    if (!signInError) {
+      // redirect to app whenever someone login
+      router.push("/application");
+      router.refresh();
+      return;
+    }
+
+    // If login fails (user doesn't exist in Supabase yet), automatically Sign Up
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: profile.email,
+      password: profile.password,
+      options: {
+        data: {
+          display_name: profile.username, // Saved to user_metadata
+        },
+      },
+    });
+
+    if (signUpError) {
+      setErrorMessage(signUpError.message);
+      setLoading(false);
+    } else {
+      // Retry login after creation
+      await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password: profile.password,
+      });
+      router.push("/");
+      router.refresh();
+    }
+  };
+
   return (
-    <Combobox
-      items={profiles}
-      itemToStringValue={(profile: Profile) => profile?.username || ""}
-      onValueChange={(profile: Profile | null) => onSelectProfile(profile)}
-    >
-      {/* Pass the string value directly to the input */}
-      <ComboboxInput
-        placeholder="Search profiles..."
-        value={selectedProfile ? selectedProfile.username : ""}
-      />
-      <ComboboxContent>
-        <ComboboxEmpty>No profiles found.</ComboboxEmpty>
-        <ComboboxList>
-          {(profile) => (
-            <ComboboxItem
-              key={profile.id}
-              value={profile}
-              disabled={profile.status === "online"}
-              className={`transition-opacity ${profile.status === "online" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
-            >
-              <Item size="xs" className="p-0">
-                <ItemContent>
-                  <ItemTitle className="whitespace-nowrap">
-                    <span
-                      className={`h-2 w-2 rounded-full ${profile.status === "online" ? "bg-green-500" : "bg-gray-400"}`}
-                    />
-                    {profile.username}
-                  </ItemTitle>
-                  <ItemDescription className="flex items-center justify-between w-full">
-                    {profile.password}{" "}
-                    <span className="text-muted-foreground">
-                      ({profile.email})
-                    </span>
-                  </ItemDescription>
-                </ItemContent>
-              </Item>
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
+    <div className="w-full flex flex-col gap-2">
+      <Combobox
+        items={profiles}
+        itemToStringValue={(profile: Profile) => profile?.username || ""}
+        onValueChange={handleProfileSelect}
+      >
+        <ComboboxInput
+          placeholder={
+            loading ? "Authenticating..." : "Search profiles to log in..."
+          }
+          value={selectedProfile ? selectedProfile.username : ""}
+          disabled={loading}
+        />
+        <ComboboxContent>
+          <ComboboxEmpty>No profiles found.</ComboboxEmpty>
+          <ComboboxList>
+            {(profile) => (
+              <ComboboxItem
+                key={profile.id}
+                value={profile}
+                disabled={profile.status === "online" || loading}
+                className={`transition-opacity ${
+                  profile.status === "online"
+                    ? "opacity-40 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+              >
+                <Item size="xs" className="p-0">
+                  <ItemContent>
+                    <ItemTitle className="whitespace-nowrap flex items-center gap-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          profile.status === "online"
+                            ? "bg-green-500"
+                            : "bg-gray-400"
+                        }`}
+                      />
+                      {profile.username}
+                    </ItemTitle>
+                    <ItemDescription className="flex items-center justify-between w-full text-xs">
+                      <span className="font-mono">{profile.password}</span>{" "}
+                      <span className="text-muted-foreground">
+                        ({profile.email})
+                      </span>
+                    </ItemDescription>
+                  </ItemContent>
+                </Item>
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+
+      {errorMessage && (
+        <p className="text-xs text-red-400 bg-red-950/40 p-2 rounded border border-red-800">
+          {errorMessage}
+        </p>
+      )}
+    </div>
   );
 }

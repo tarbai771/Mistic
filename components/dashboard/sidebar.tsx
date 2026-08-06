@@ -1,5 +1,6 @@
 "use client";
 
+import type { User } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -11,6 +12,8 @@ import {
   Phone,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export type SidebarTab = "Calls" | "Sketch" | "Editor" | "Vault";
 
@@ -27,12 +30,30 @@ export default function Sidebar({
   collapsed,
   setCollapsed,
 }: SidebarProps) {
+  // get user data
+  const [user, setUser] = useState<User | null>(null);
+
+  // 4. Fetch user inside useEffect
+  useEffect(() => {
+    const supabase = createClient();
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    }
+
+    getUser();
+  }, []);
+
   const navItems = [
     { id: "Calls", label: "Calls", icon: Phone, badge: "LIVE" },
     { id: "Sketch", label: "Sketch", icon: PenTool, badge: "NEW" },
     { id: "Editor", label: "Editor", icon: FileText, badge: "2" },
     { id: "Vault", label: "Vault", icon: Lock, badge: "SECURE" },
   ];
+
+  console.log(user);
 
   return (
     <>
@@ -139,7 +160,7 @@ export default function Sidebar({
               {!collapsed && (
                 <div className="flex flex-col min-w-0 text-left">
                   <span className="text-[11px] font-bold text-white truncate font-mono">
-                    Lily Chou
+                    {user.name}
                   </span>
                   <span className="text-[9px] text-muted-foreground/75 truncate font-mono">
                     Lead Designer
