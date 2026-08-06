@@ -14,43 +14,55 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { type Profile, TestSignUp } from "./testing-sign-up";
 import { Separator } from "./ui/separator";
 
-export function SignUpComponent() {
+export function LoginComponent() {
   // Store the full profile object (or null)
-  const [username, setUsername] = useState("");
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleSelectProfile = (profile: Profile | null) => {
+    setSelectedProfile(profile); // Track the object
+    if (profile) {
+      setEmail(profile.email);
+      setPassword(profile.password);
+    } else {
+      setEmail("");
+      setPassword("");
+    }
+  };
 
   return (
     <Card className="h-125 w-full max-w-sm">
       <h2 className="flex justify-center items-center font-bold text-2xl">
-        Sign Up
+        Log In
       </h2>
       <Separator />
       <CardHeader>
-        <CardTitle className="text-lg font-bold">Create New Account</CardTitle>
-        <CardDescription>Fill out the fields down below</CardDescription>
+        <CardTitle className="text-lg font-bold">
+          Logging just to test app?
+        </CardTitle>
+        <CardDescription>Select any Profile from below</CardDescription>
         <CardAction>
           <Button variant="link">
-            <Link href="/login">Login</Link>
+            <Link href="/sign-up">Sign Up</Link>
           </Button>
         </CardAction>
       </CardHeader>
       <CardContent>
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="flex flex-col gap-6">
-            <div className="grid gap-1">
-              <Label htmlFor="email">Username</Label>
-              {/* Link value and setter to state */}
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
+            <div className="grid gap-2">
+              <Label htmlFor="profile">Profiles</Label>
+              {/* Pass the callback down */}
+              <TestSignUp
+                selectedProfile={selectedProfile}
+                onSelectProfile={handleSelectProfile}
               />
             </div>
+            <Separator />
             <div className="grid gap-1">
               <Label htmlFor="email">Email</Label>
               {/* Link value and setter to state */}
@@ -70,15 +82,15 @@ export function SignUpComponent() {
                   href="/placeholder" //placeholding
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
-                  Generate Password
+                  Forgot your password?
                 </a>
               </div>
               {/* Link value and setter to state */}
               <Input
                 id="password"
                 type="password"
-                placeholder="xxxx-xxxx"
                 value={password}
+                placeholder="xxxx-xxxx"
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
@@ -88,10 +100,10 @@ export function SignUpComponent() {
       </CardContent>
       <CardFooter className="flex-col gap-2 mt-auto">
         <Button type="submit" className="w-full">
-          Sign Up
+          Login
         </Button>
         <Button variant="outline" className="w-full">
-          Sign Up with Google
+          Login with Google
         </Button>
       </CardFooter>
     </Card>

@@ -179,7 +179,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary mb-8 hover:bg-primary/10 transition-colors cursor-pointer"
           >
             <Sparkles className="size-3.5" />
-            <Link href="/application">
+            <Link href="/dashboard">
               <span>Mistic v1.0 is officially live</span>
             </Link>
             <ArrowRight className="size-3" />

@@ -7,7 +7,8 @@ export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  if (pathname?.startsWith("/application")) {
+  // Hides Footer in Dashboard
+  if (pathname?.startsWith("/dashbaord")) {
     return null;
   }
 

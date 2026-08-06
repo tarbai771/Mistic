@@ -8,7 +8,8 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute =
     pathname === "/" ||
     pathname.startsWith("/docs") ||
-    pathname.startsWith("/pricing");
+    pathname.startsWith("/pricing") ||
+    pathname.startsWith("/sign-up");
 
   if (isPublicRoute) {
     return NextResponse.next();
