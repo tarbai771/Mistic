@@ -29,7 +29,7 @@ export function SignUpComponent() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 2. Email/Password Sign Up Handler
+  // Handle Form Submit
   const handleSignUp = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -55,10 +55,8 @@ export function SignUpComponent() {
     }
 
     if (data.session) {
-      // User is signed up and automatically logged in
       router.push("/dashboard");
     } else {
-      // Email confirmation is required
       alert("Please check your email to confirm your account!");
     }
 
@@ -67,7 +65,7 @@ export function SignUpComponent() {
     router.refresh();
   };
 
-  // 3. Google OAuth Handler
+  // Google OAuth Handler
   const handleGoogleSignUp = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -76,6 +74,56 @@ export function SignUpComponent() {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+  };
+
+  // Cryptographically secure random integer generator
+  function getRandomInt(max: number): number {
+    const randomBuffer = new Uint32Array(1);
+    window.crypto.getRandomValues(randomBuffer);
+    return randomBuffer[0] % max;
+  }
+
+  // Generate a random Password
+  function generateSecurePassword(length = 16): string {
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const allChars = lowercase + uppercase + numbers + symbols;
+
+    // Guarantee at least one character from each set
+    const required = [
+      lowercase[getRandomInt(lowercase.length)],
+      uppercase[getRandomInt(uppercase.length)],
+      numbers[getRandomInt(numbers.length)],
+      symbols[getRandomInt(symbols.length)],
+    ];
+
+    // Fill the rest with random characters from all sets
+    const remainingLength = length - required.length;
+    const remaining = Array.from(
+      { length: remainingLength },
+      () => allChars[getRandomInt(allChars.length)],
+    );
+
+    // Combine and shuffle using Fisher-Yates with crypto randomness
+    const passwordArray = [...required, ...remaining];
+    for (let i = passwordArray.length - 1; i > 0; i--) {
+      const j = getRandomInt(i + 1);
+      [passwordArray[i], passwordArray[j]] = [
+        passwordArray[j],
+        passwordArray[i],
+      ];
+    }
+
+    return passwordArray.join("");
+  }
+
+  // Handler to generate and reveal password
+  const handleGeneratePassword = () => {
+    const newPassword = generateSecurePassword(16);
+    setPassword(newPassword);
+    setShowPassword(true); // Automatically reveal password so user can see/copy it
   };
 
   return (
@@ -125,12 +173,19 @@ export function SignUpComponent() {
             </div>
 
             <div className="grid gap-1">
-              <Label htmlFor="password">Password</Label>
-
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <button
+                  type="button" // CRITICAL: type="button" prevents form submission
+                  onClick={handleGeneratePassword}
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Generate Password
+                </button>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
-                  // Toggle dynamic type here:
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}

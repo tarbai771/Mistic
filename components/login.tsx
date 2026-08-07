@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// 1. Import browser Supabase client
 import { createClient } from "@/lib/supabase/client";
 import { type Profile, TestSignUp } from "./testing-sign-up";
 import { Separator } from "./ui/separator";
@@ -40,7 +39,7 @@ export function LoginComponent() {
     }
   };
 
-  // 2. Handle Email & Password Login
+  // Handle Email & Password Login
   const handleLogin = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -65,7 +64,7 @@ export function LoginComponent() {
     router.refresh();
   };
 
-  // 3. Handle Google OAuth Login
+  // Handle Google OAuth Login
   const handleGoogleLogin = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
