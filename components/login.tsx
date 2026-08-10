@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,6 +28,7 @@ export function LoginComponent() {
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSelectProfile = (profile: Profile | null) => {
     setSelectedProfile(profile);
@@ -59,8 +61,8 @@ export function LoginComponent() {
       return;
     }
 
-    // Redirect to home/app after logging in successfully
-    router.push("/");
+    // Redirect to /dashboard after logging in successfully
+    router.push("/dashboard");
     router.refresh();
   };
 
@@ -77,7 +79,7 @@ export function LoginComponent() {
 
   return (
     <Card className="w-full max-w-sm">
-      <h2 className="flex justify-center items-center font-bold text-2xl py-4">
+      <h2 className="flex justify-center items-center font-bold text-2xl">
         Log In
       </h2>
       <Separator />
@@ -129,14 +131,31 @@ export function LoginComponent() {
                   Forgot your password?
                 </a>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                placeholder="••••••••"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button" // Prevents triggering form submission on click!
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1} // Prevents tabbing into the eye icon before other inputs
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? "Hide password" : "Show password"}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </form>

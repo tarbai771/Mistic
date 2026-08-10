@@ -21,6 +21,7 @@ import { Separator } from "./ui/separator";
 
 export function SignUpComponent() {
   const router = useRouter();
+  const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,7 +43,8 @@ export function SignUpComponent() {
       password,
       options: {
         data: {
-          username: username, // Stores custom username in user_metadata
+          username: username,
+          display_name: displayName,
         },
       },
     });
@@ -54,15 +56,15 @@ export function SignUpComponent() {
       return;
     }
 
+    // Option A: Email confirmation is DISABLED in Supabase (Session exists immediately)
     if (data.session) {
       router.push("/dashboard");
-    } else {
-      alert("Please check your email to confirm your account!");
+      return;
     }
 
-    // Redirect to home/app page on success
-    router.push("/");
-    router.refresh();
+    // Option B: Email confirmation is ENABLED in Supabase (No session yet)
+    alert("Please check your email to confirm your account!");
+    router.push("/login"); // Direct them to login instead of dashboard
   };
 
   // Google OAuth Handler
@@ -128,7 +130,7 @@ export function SignUpComponent() {
 
   return (
     <Card className="w-full max-w-sm">
-      <h2 className="flex justify-center items-center font-bold text-2xl py-4">
+      <h2 className="flex justify-center items-center font-bold text-2xl">
         Sign Up
       </h2>
       <Separator />
@@ -150,10 +152,23 @@ export function SignUpComponent() {
             )}
 
             <div className="grid gap-1">
+              <Label htmlFor="display_name">Display Name</Label>
+              <Input
+                id="display_name"
+                type="text"
+                placeholder="Your Name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="grid gap-1">
               <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
                 type="text"
+                placeholder="user_name"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -165,7 +180,7 @@ export function SignUpComponent() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="me@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

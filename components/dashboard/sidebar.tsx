@@ -36,14 +36,26 @@ export default function Sidebar({
   // 4. Fetch user inside useEffect
   useEffect(() => {
     const supabase = createClient();
-    async function getUser() {
+
+    // 1. Get initial user
+    const fetchUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
-    }
+    };
+    fetchUser();
 
-    getUser();
+    // 2. Listen for real-time auth changes (hydration, sign-in, sign-out)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const navItems = [
@@ -160,7 +172,7 @@ export default function Sidebar({
               {!collapsed && (
                 <div className="flex flex-col min-w-0 text-left">
                   <span className="text-[11px] font-bold text-white truncate font-mono">
-                    {user.name}
+                    {user?.user_metadata.display_name}
                   </span>
                   <span className="text-[9px] text-muted-foreground/75 truncate font-mono">
                     Lead Designer
