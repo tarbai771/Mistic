@@ -65,8 +65,6 @@ export default function Sidebar({
     { id: "Vault", label: "Vault", icon: Lock, badge: "SECURE" },
   ];
 
-  console.log(user);
-
   return (
     <>
       {/* 1. Desktop Left Sidebar (remains visible on medium widths and up) */}

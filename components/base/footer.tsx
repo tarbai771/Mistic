@@ -8,7 +8,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   // Hides Footer in Dashboard
-  if (pathname?.startsWith("/dashbaord")) {
+  if (pathname?.startsWith("/dashboard")) {
     return null;
   }
 

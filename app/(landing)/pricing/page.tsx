@@ -379,7 +379,7 @@ export default function PricingPage() {
               {plan.highlight ? (
                 <MagneticButton className="w-full">
                   <a
-                    href="/app"
+                    href="/dashboard"
                     className="flex h-11 items-center justify-center gap-1.5 rounded-lg bg-primary w-full text-xs font-bold text-white shadow-md hover:bg-primary/95 transition-colors border border-primary/20"
                   >
                     <span>{plan.cta}</span>
@@ -388,7 +388,7 @@ export default function PricingPage() {
                 </MagneticButton>
               ) : (
                 <a
-                  href="/app"
+                  href="/dashboard"
                   className="flex h-11 items-center justify-center gap-1.5 rounded-lg border border-border bg-[#18181c] w-full text-xs font-semibold text-white hover:bg-[#202024] hover:border-white/20 transition-all duration-200"
                 >
                   <span>{plan.cta}</span>

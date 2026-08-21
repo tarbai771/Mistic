@@ -9,7 +9,9 @@ export async function proxy(request: NextRequest) {
     pathname === "/" ||
     pathname.startsWith("/docs") ||
     pathname.startsWith("/pricing") ||
-    pathname.startsWith("/sign-up");
+    pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/auth");
 
   if (isPublicRoute) {
     return NextResponse.next();
