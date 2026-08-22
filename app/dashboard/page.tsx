@@ -4,6 +4,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -21,7 +23,7 @@ export default async function DashboardPage() {
   return (
     <TooltipProvider delayDuration={0}>
       <SidebarProvider>
-        <AppSidebar user={user}/>
+        <AppSidebar user={user} />
         <main className="w-full p-4">
           <SidebarTrigger />
           {/* {children} */}

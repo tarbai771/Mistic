@@ -74,12 +74,12 @@ export function AppSidebar({
         items: [
           {
             title: "Create a Room",
-            url: "#",
+            url: "/dashboard/rooms",
             icon: <Plus />,
           },
           {
             title: "Enter Code to Join",
-            url: "#",
+            url: "/dashboard/rooms",
             icon: <TextCursorInputIcon />,
           },
         ],
@@ -169,7 +169,7 @@ export function AppSidebar({
       },
       {
         name: "Setting",
-        url: "/settings",
+        url: "/dashboard/settings",
         icon: <Settings />,
       },
     ],

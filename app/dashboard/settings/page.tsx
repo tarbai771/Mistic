@@ -1,13 +1,12 @@
 "use client";
 
-import { Bell, KeyRound, Lock, Moon, Shield, Sun, Trash2 } from "lucide-react";
+import { Bell, KeyRound, Shield, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -53,7 +52,10 @@ export default function SettingsPage() {
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="w-4 h-4" /> Security
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger
+            value="notifications"
+            className="flex items-center gap-2"
+          >
             <Bell className="w-4 h-4" /> Notifications
           </TabsTrigger>
           <TabsTrigger value="danger" className="flex items-center gap-2">
@@ -73,7 +75,9 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between border-b pb-4">
                 <div className="space-y-0.5">
-                  <Label className="text-base font-medium">Change Password</Label>
+                  <Label className="text-base font-medium">
+                    Change Password
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Send a password reset email to your registered address.
                   </p>
@@ -90,7 +94,9 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base font-medium">Security Alerts</Label>
+                  <Label className="text-base font-medium">
+                    Security Alerts
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Receive emails when new devices log into your account.
                   </p>
@@ -116,7 +122,9 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base font-medium">Product Updates</Label>
+                  <Label className="text-base font-medium">
+                    Product Updates
+                  </Label>
                   <p className="text-sm text-muted-foreground">
                     Get emails about new features, improvements, and news.
                   </p>
@@ -146,7 +154,8 @@ export default function SettingsPage() {
                     Delete Account
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Permanently remove your account, profile, and database records.
+                    Permanently remove your account, profile, and database
+                    records.
                   </p>
                 </div>
                 <Button variant="destructive">Delete Account</Button>
