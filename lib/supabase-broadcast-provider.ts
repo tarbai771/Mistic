@@ -1,117 +1,78 @@
 "use client";
 
+import {
+  Awareness,
+  applyAwarenessUpdate,
+  encodeAwarenessUpdate,
+  removeAwarenessStates,
+} from "y-protocols/awareness";
 import * as Y from "yjs";
 import { createClient } from "@/lib/supabase/client";
 
 type StatusHandler = (status: { connected: boolean }) => void;
 type DestroyHandler = () => void;
 
-interface AwarenessState {
-  user?: { name: string; color: string };
-  [key: string]: unknown;
-}
-
-class BroadcastAwareness {
-  private states = new Map<number, AwarenessState>();
-  localClientId: number;
-  private updateHandlers: Array<() => void> = [];
-
-  constructor() {
-    this.localClientId = Math.floor(Math.random() * 2 ** 31);
-  }
-
-  getStates() {
-    return this.states;
-  }
-
-  setLocalStateField(field: string, value: unknown) {
-    const current = this.states.get(this.localClientId) || {};
-    this.states.set(this.localClientId, { ...current, [field]: value });
-    this.emitUpdate();
-  }
-
-  getLocalState(): AwarenessState | undefined {
-    return this.states.get(this.localClientId);
-  }
-
-  on(event: string, handler: () => void) {
-    if (event === "update") {
-      this.updateHandlers.push(handler);
-    }
-  }
-
-  off(event: string, handler: () => void) {
-    if (event === "update") {
-      this.updateHandlers = this.updateHandlers.filter((h) => h !== handler);
-    }
-  }
-
-  private emitUpdate() {
-    for (const handler of this.updateHandlers) {
-      handler();
-    }
-  }
-
-  receiveUpdate(clientId: number, state: AwarenessState | null) {
-    if (state === null) {
-      this.states.delete(clientId);
-    } else {
-      this.states.set(clientId, state);
-    }
-    this.emitUpdate();
-  }
-
-  destroy() {
-    this.states.clear();
-    this.updateHandlers = [];
-  }
-}
-
 export class SupabaseBroadcastProvider {
   private channel: ReturnType<ReturnType<typeof createClient>["channel"]>;
   private doc: Y.Doc;
-  awareness: BroadcastAwareness;
+  awareness: Awareness;
   private statusHandlers: StatusHandler[] = [];
   private destroyHandlers: DestroyHandler[] = [];
   private docUpdateHandler: (update: Uint8Array, origin: unknown) => void;
+  private awarenessUpdateHandler: (
+    changes: { added: number[]; updated: number[]; removed: number[] },
+    origin: unknown,
+  ) => void;
   private _destroyed = false;
   private _subscribed = false;
+  private _pendingUser: { name: string; color: string } | null = null;
 
   constructor(roomCode: string, doc: Y.Doc) {
     this.doc = doc;
-    this.awareness = new BroadcastAwareness();
+    this.awareness = new Awareness(doc);
     this.channel = createClient().channel(`room-${roomCode}`);
 
     // Broadcast local doc updates
     this.docUpdateHandler = (update: Uint8Array, origin: unknown) => {
       if (this._destroyed) return;
-      if (origin === this) return; // Skip updates from this provider
-      if (!this._subscribed) return; // Wait for WebSocket connection
+      if (origin === this) return;
+      if (!this._subscribed) return;
 
-      // Convert Uint8Array to regular array for JSON serialization
       const data = Array.from(update);
       this.channel.send({
         type: "broadcast",
         event: "doc-update",
         payload: { data },
       });
-
-      // Also broadcast awareness
-      const localState = this.awareness.getLocalState();
-      if (localState) {
-        this.channel.send({
-          type: "broadcast",
-          event: "awareness-update",
-          payload: {
-            clientId: this.awareness.localClientId,
-            state: localState,
-          },
-        });
-      }
     };
     this.doc.on("update", this.docUpdateHandler);
 
-    // Listen for remote updates
+    // Broadcast local awareness changes to other tabs
+    this.awarenessUpdateHandler = (
+      changes: { added: number[]; updated: number[]; removed: number[] },
+      origin: unknown,
+    ) => {
+      if (this._destroyed) return;
+      if (origin === this) return;
+      if (!this._subscribed) return;
+
+      const changedClients = [
+        ...changes.added,
+        ...changes.updated,
+        ...changes.removed,
+      ];
+      if (changedClients.length === 0) return;
+
+      const update = encodeAwarenessUpdate(this.awareness, changedClients);
+      this.channel.send({
+        type: "broadcast",
+        event: "awareness-update",
+        payload: { data: Array.from(update) },
+      });
+    };
+    this.awareness.on("update", this.awarenessUpdateHandler);
+
+    // Listen for remote doc updates
     this.channel.on(
       "broadcast",
       { event: "doc-update" },
@@ -122,16 +83,14 @@ export class SupabaseBroadcastProvider {
       },
     );
 
-    // Listen for remote awareness
+    // Listen for remote awareness updates
     this.channel.on(
       "broadcast",
       { event: "awareness-update" },
-      (payload: { payload: { clientId: number; state: AwarenessState } }) => {
+      (payload: { payload: { data: number[] } }) => {
         if (this._destroyed) return;
-        this.awareness.receiveUpdate(
-          payload.payload.clientId,
-          payload.payload.state,
-        );
+        const update = new Uint8Array(payload.payload.data);
+        applyAwarenessUpdate(this.awareness, update, this);
       },
     );
 
@@ -141,7 +100,7 @@ export class SupabaseBroadcastProvider {
       { event: "awareness-leave" },
       (payload: { payload: { clientId: number } }) => {
         if (this._destroyed) return;
-        this.awareness.receiveUpdate(payload.payload.clientId, null);
+        removeAwarenessStates(this.awareness, [payload.payload.clientId], this);
       },
     );
 
@@ -150,13 +109,24 @@ export class SupabaseBroadcastProvider {
       if (this._destroyed) return;
       if (status === "SUBSCRIBED") {
         this._subscribed = true;
-        // Send current doc state to sync with existing peers
-        const stateVector = Y.encodeStateVector(this.doc);
-        this.channel.send({
-          type: "broadcast",
-          event: "sync-request",
-          payload: { data: Array.from(stateVector) },
-        });
+        setTimeout(() => {
+          if (this._destroyed) return;
+          const stateVector = Y.encodeStateVector(this.doc);
+          this.channel.send({
+            type: "broadcast",
+            event: "sync-request",
+            payload: { data: Array.from(stateVector) },
+          });
+          const localState = this.awareness.getLocalState();
+          if (localState) {
+            this._broadcastAwarenessState();
+          }
+          if (this._pendingUser) {
+            this.awareness.setLocalStateField("user", this._pendingUser);
+            this._broadcastAwarenessState();
+            this._pendingUser = null;
+          }
+        }, 0);
         this.emitStatus(true);
       } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
         this.emitStatus(false);
@@ -172,7 +142,6 @@ export class SupabaseBroadcastProvider {
         const remoteVector = new Uint8Array(payload.payload.data);
         const diff = Y.encodeStateAsUpdate(this.doc, remoteVector);
         if (diff.length > 1) {
-          // More than just the empty byte
           this.channel.send({
             type: "broadcast",
             event: "doc-update",
@@ -187,6 +156,26 @@ export class SupabaseBroadcastProvider {
     for (const handler of this.statusHandlers) {
       handler({ connected });
     }
+  }
+
+  setUser(user: { name: string; color: string }) {
+    this.awareness.setLocalStateField("user", user);
+    if (this._subscribed) {
+      this._broadcastAwarenessState();
+    } else {
+      this._pendingUser = user;
+    }
+  }
+
+  private _broadcastAwarenessState() {
+    const update = encodeAwarenessUpdate(this.awareness, [
+      this.awareness.clientID,
+    ]);
+    this.channel.send({
+      type: "broadcast",
+      event: "awareness-update",
+      payload: { data: Array.from(update) },
+    });
   }
 
   on(event: string, handler: StatusHandler | DestroyHandler) {
@@ -210,16 +199,16 @@ export class SupabaseBroadcastProvider {
     this._destroyed = true;
     this._subscribed = false;
 
-    // Notify peers we're leaving
     this.channel.send({
       type: "broadcast",
       event: "awareness-leave",
       payload: {
-        clientId: this.awareness.localClientId,
+        clientId: this.awareness.clientID,
       },
     });
 
     this.doc.off("update", this.docUpdateHandler);
+    this.awareness.off("update", this.awarenessUpdateHandler);
     this.awareness.destroy();
     createClient().removeChannel(this.channel);
 

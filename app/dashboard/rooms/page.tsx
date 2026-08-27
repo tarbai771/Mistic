@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, LogIn } from "lucide-react";
+import { LogIn, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ function generateRoomCode(): string {
   const segment = () =>
     Array.from(
       { length: 4 },
-      () => chars[Math.floor(Math.random() * chars.length)]
+      () => chars[Math.floor(Math.random() * chars.length)],
     ).join("");
   return `${segment()}-${segment()}`;
 }

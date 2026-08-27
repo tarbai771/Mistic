@@ -14,6 +14,7 @@ import {
   ListOrdered,
   Strikethrough,
 } from "lucide-react";
+import { useEffect } from "react";
 import type * as Y from "yjs";
 import { Toggle } from "@/components/ui/toggle";
 import type { SupabaseBroadcastProvider } from "@/lib/supabase-broadcast-provider";
@@ -44,6 +45,10 @@ function CollaborativeTiptap({
       CollaborationCursor.configure({ provider, user }),
     ],
   });
+
+  useEffect(() => {
+    provider.setUser(user);
+  }, [provider, user]);
 
   const handleExportMarkdown = () => {
     if (!editor) return;

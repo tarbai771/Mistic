@@ -16,6 +16,15 @@ const CollaborativeEditor = dynamic(
   { ssr: false },
 );
 
+// Dynamically import Excalidraw Board
+const ExcalidrawBoard = dynamic(
+  () =>
+    import("@/components/workspace/ExcalidrawBoard").then(
+      (m) => m.ExcalidrawBoard
+    ),
+  { ssr: false }
+);
+
 const CURSOR_COLORS = [
   "#f87171",
   "#fb923c",
@@ -124,6 +133,14 @@ export default function ActiveRoomPage() {
 
       {/* Main Workspace Area */}
       <main className="flex-1 p-6 bg-background overflow-hidden flex flex-col">
+        {activeTab === "canvas" && doc && (
+          <ExcalidrawBoard
+            doc={doc}
+            provider={provider}
+            user={userInfo ?? undefined}
+          />
+        )}
+
         {activeTab === "notes" && doc && (
           <CollaborativeEditor
             doc={doc}
