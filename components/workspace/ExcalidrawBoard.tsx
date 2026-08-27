@@ -62,7 +62,7 @@ function InnerExcalidrawBoard({ doc, provider, user }: ExcalidrawBoardProps) {
   };
 
   return (
-    <div className="w-full h-full min-h-[500px] border rounded-lg overflow-hidden relative bg-background flex-1">
+    <div className="w-full h-full min-h-125 border rounded-lg overflow-hidden relative bg-background flex-1">
       <Excalidraw
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
         isCollaborating={true}
