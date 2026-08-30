@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { useYjsRoom } from "@/hooks/useYjsRoom";
 import { createClient } from "@/lib/supabase/client";
 
+const VideoCallTab = dynamic(
+  () =>
+    import("@/components/workspace/VideoCallTab").then((m) => m.VideoCallTab),
+  { ssr: false },
+);
+
 const CollaborativeEditor = dynamic(
   () =>
     import("@/components/workspace/CollaborativeEditor").then(
@@ -20,9 +26,9 @@ const CollaborativeEditor = dynamic(
 const ExcalidrawBoard = dynamic(
   () =>
     import("@/components/workspace/ExcalidrawBoard").then(
-      (m) => m.ExcalidrawBoard
+      (m) => m.ExcalidrawBoard,
     ),
-  { ssr: false }
+  { ssr: false },
 );
 
 const CURSOR_COLORS = [
@@ -133,6 +139,10 @@ export default function ActiveRoomPage() {
 
       {/* Main Workspace Area */}
       <main className="flex-1 p-6 bg-background overflow-hidden flex flex-col">
+        {activeTab === "call" && (
+          <VideoCallTab roomCode={code} user={userInfo ?? undefined} />
+        )}
+
         {activeTab === "canvas" && doc && (
           <ExcalidrawBoard
             doc={doc}
